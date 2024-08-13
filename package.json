@@ -1,0 +1,16 @@
+{
+  "name": "file-server-management",
+  "version": "1.0.0",
+  "description": "A web-based file server management system",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

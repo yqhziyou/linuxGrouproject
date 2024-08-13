@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Server Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>File Server Management</h1>
+
+    <div class="section">
+        <h2>File Transfer</h2>
+        <input type="text" id="sourceFile" placeholder="Source file path">
+        <input type="text" id="destFile" placeholder="Destination file path">
+        <button onclick="transferFile('Windows to Linux')">Windows to Linux</button>
+        <button onclick="transferFile('Linux to Windows')">Linux to Windows</button>
+    </div>
+
+    <div class="section">
+        <h2>User Management</h2>
+        <input type="text" id="username" placeholder="Username">
+        <button onclick="manageUser('add')">Add User</button>
+        <button onclick="manageUser('remove')">Remove User</button>
+    </div>
+
+    <div class="section">
+        <h2>System Management</h2>
+        <button onclick="systemTask('backup')">Backup</button>
+        <button onclick="systemTask('dns')">Configure DNS</button>
+        <button onclick="systemTask('printer')">Setup Printer Sharing</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
