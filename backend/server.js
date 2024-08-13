@@ -7,6 +7,21 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+const auth = (req, res, next) => {
+    const { username, password } = req.headers;
+    
+    // This should use a more secure method of storing and comparing passwords
+    if (username === 'admin' && password === 'password') {
+        next();
+    } else {
+        res.status(401).json({ success: false, message: 'Authentication failed' });
+    }
+};
+
+app.use('/api/user', auth);
+app.use('/api/system', auth);
+app.use('/api/acl', auth);
+
 app.post('/api/transfer', (req, res) => {
     const { direction, sourceFile, destFile } = req.body;
     let command;
@@ -36,23 +51,63 @@ app.post('/api/transfer', (req, res) => {
 });
 
 app.post('/api/user', (req, res) => {
-    const { action, username } = req.body;
+    const { action, username, groupname } = req.body;
     let command;
 
-    if (action === 'add') {
-        command = `sudo useradd ${username}`;
-    } else if (action === 'remove') {
-        command = `sudo userdel ${username}`;
-    } else {
-        res.json({ success: false, message: 'Invalid action' });
-        return;
+    switch (action) {
+        case 'add':
+            command = `sudo useradd ${username}`;
+            break;
+        case 'remove':
+            command = `sudo userdel ${username}`;
+            break;
+        case 'addToGroup':
+            command = `sudo usermod -aG ${groupname} ${username}`;
+            break;
+        case 'removeFromGroup':
+            command = `sudo gpasswd -d ${username} ${groupname}`;
+            break;
+        case 'createGroup':
+            command = `sudo groupadd ${groupname}`;
+            break;
+        case 'deleteGroup':
+            command = `sudo groupdel ${groupname}`;
+            break;
+        default:
+            res.json({ success: false, message: 'Invalid action' });
+            return;
     }
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            res.json({ success: false, message: `Error ${action}ing user: ${stderr}` });
+            res.json({ success: false, message: `User/group operation failed: ${stderr}` });
         } else {
-            res.json({ success: true, message: `User ${username} ${action}ed successfully` });
+            res.json({ success: true, message: `User/group operation completed successfully` });
+        }
+    });
+});
+
+app.post('/api/acl', (req, res) => {
+    const { action, path, user, permissions } = req.body;
+    let command;
+
+    switch (action) {
+        case 'set':
+            command = `sudo setfacl -m u:${user}:${permissions} ${path}`;
+            break;
+        case 'get':
+            command = `sudo getfacl ${path}`;
+            break;
+        default:
+            res.json({ success: false, message: 'Invalid action' });
+            return;
+    }
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            res.json({ success: false, message: `ACL operation failed: ${stderr}` });
+        } else {
+            res.json({ success: true, message: `ACL operation completed successfully`, output: stdout });
         }
     });
 });
