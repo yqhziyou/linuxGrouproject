@@ -66,10 +66,10 @@ app.post('/api/system', (req, res) => {
             command = 'tar -czf ~/backup/data_backup.tar.gz ~/data && rsync -avz ~/backup/data_backup.tar.gz ~/backup_destination';
             break;
         case 'dns':
-            command = 'sudo nano /etc/hosts && sudo systemctl restart systemd-resolved';
+            command = 'sudo sed -i "/^127.0.0.1/c\\127.0.0.1 localhost $(hostname)" /etc/hosts && sudo systemctl restart systemd-resolved';
             break;
         case 'printer':
-            command = 'sudo apt-get update && sudo apt-get install -y cups && sudo systemctl start cups && sudo systemctl enable cups && sudo cupsctl --share-printers && sudo systemctl restart cups';
+            command = 'sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y cups && sudo systemctl start cups && sudo systemctl enable cups && sudo cupsctl --share-printers --remote-any && sudo systemctl restart cups';
             break;
         default:
             res.json({ success: false, message: `Unknown system task: ${task}` });
