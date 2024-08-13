@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set environment variables
-export SSH_KEY_PATH="/home/ubuntu/KelvinsFirstKey"
+export SSH_KEY_PATH="/home/ubuntu/KelvinsFirstKey.pem"
 export WINDOWS_USER="your_windows_username"
 export WINDOWS_PASS="your_windows_password"
 export WINDOWS_IP="your_windows_ip"
