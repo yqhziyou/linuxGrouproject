@@ -12,10 +12,14 @@
 
     <div class="section">
         <h2>File Transfer</h2>
-        <input type="text" id="sourceFile" placeholder="Source file path">
-        <input type="text" id="destFile" placeholder="Destination file path">
-        <button onclick="transferFile('Windows to Linux')">Windows to Linux</button>
-        <button onclick="transferFile('Linux to Windows')">Linux to Windows</button>
+        <select id="transferDirection">
+            <option value="windows-to-linux">Windows to Linux</option>
+            <option value="linux-to-windows">Linux to Windows</option>
+            <option value="linux-to-linux">Linux to Linux</option>
+        </select>
+        <input type="text" id="sourceFile" placeholder="Source File">
+        <input type="text" id="destFile" placeholder="Destination File">
+        <button onclick="transferFile()">Transfer</button>
     </div>
 
     <div class="section">
@@ -32,7 +36,6 @@
         <button onclick="systemTask('printer')">Setup Printer Sharing</button>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>

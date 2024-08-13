@@ -2,10 +2,10 @@
   "name": "file-server-management",
   "version": "1.0.0",
   "description": "A web-based file server management system",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "express": "^4.17.1"

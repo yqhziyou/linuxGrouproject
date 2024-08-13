@@ -8,76 +8,80 @@ app.use(express.static('frontend'));
 
 app.post('/api/transfer', (req, res) => {
     const { direction, sourceFile, destFile } = req.body;
-    // Here you would implement the actual file transfer logic
-    // For example, using scp or rsync
-    res.json({ success: true, message: `File transfer initiated: ${sourceFile} to ${destFile}` });
+    let command;
+
+    switch (direction) {
+        case 'windows-to-linux':
+            command = `smbclient '//WINDOWS_IP/share' -c 'get "${sourceFile}" "${destFile}"'`;
+            break;
+        case 'linux-to-windows':
+            command = `smbclient '//WINDOWS_IP/share' -c 'put "${sourceFile}" "${destFile}"'`;
+            break;
+        case 'linux-to-linux':
+            command = `scp ${sourceFile} user@SERVER_IP:${destFile}`;
+            break;
+        default:
+            res.json({ success: false, message: 'Invalid transfer direction' });
+            return;
+    }
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            res.json({ success: false, message: `File transfer failed: ${stderr}` });
+        } else {
+            res.json({ success: true, message: `File transfer initiated: ${sourceFile} to ${destFile}` });
+        }
+    });
 });
 
 app.post('/api/user', (req, res) => {
     const { action, username } = req.body;
+    let command;
+
     if (action === 'add') {
-        exec(`sudo useradd ${username}`, (error, stdout, stderr) => {
-            if (error) {
-                res.json({ success: false, message: `Error adding user: ${stderr}` });
-            } else {
-                res.json({ success: true, message: `User ${username} added successfully` });
-            }
-        });
+        command = `sudo useradd ${username}`;
     } else if (action === 'remove') {
-        exec(`sudo userdel ${username}`, (error, stdout, stderr) => {
-            if (error) {
-                res.json({ success: false, message: `Error removing user: ${stderr}` });
-            } else {
-                res.json({ success: true, message: `User ${username} removed successfully` });
-            }
-        });
+        command = `sudo userdel ${username}`;
+    } else {
+        res.json({ success: false, message: 'Invalid action' });
+        return;
     }
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            res.json({ success: false, message: `Error ${action}ing user: ${stderr}` });
+        } else {
+            res.json({ success: true, message: `User ${username} ${action}ed successfully` });
+        }
+    });
 });
 
 app.post('/api/system', (req, res) => {
     const { task } = req.body;
-    // Implement system tasks here
+    let command;
+
     switch (task) {
         case 'backup':
-            exec('mkdir -p ~/backup && tar -czf ~/backup/data_backup.tar.gz ~/data && rsync -avz ~/backup/data_backup.tar.gz ~/backup_destination', (error, stdout, stderr) => {
-                if (error) {
-                    res.json({ success: false, message: `Backup failed: ${stderr}` });
-                } else {
-                    res.json({ success: true, message: 'Backup completed successfully' });
-                }
-            });
+            command = 'tar -czf ~/backup/data_backup.tar.gz ~/data && rsync -avz ~/backup/data_backup.tar.gz ~/backup_destination';
             break;
-
         case 'dns':
-            exec('sudo nano /etc/hosts && sudo systemctl restart systemd-resolved', (error, stdout, stderr) => {
-                if (error) {
-                    res.json({ success: false, message: `DNS configuration failed: ${stderr}` });
-                } else {
-                    res.json({ success: true, message: 'DNS configuration completed successfully' });
-                }
-            });
+            command = 'sudo nano /etc/hosts && sudo systemctl restart systemd-resolved';
             break;
-
         case 'printer':
-            exec('sudo apt-get update && sudo apt-get install -y cups && sudo systemctl start cups && sudo systemctl enable cups', (error, stdout, stderr) => {
-                if (error) {
-                    res.json({ success: false, message: `Printer sharing setup failed: ${stderr}` });
-                } else {
-                    exec('sudo cupsctl --share-printers && sudo systemctl restart cups', (error, stdout, stderr) => {
-                        if (error) {
-                            res.json({ success: false, message: `Printer sharing configuration failed: ${stderr}` });
-                        } else {
-                            res.json({ success: true, message: 'Printer sharing setup completed successfully' });
-                        }
-                    });
-                }
-            });
+            command = 'sudo apt-get update && sudo apt-get install -y cups && sudo systemctl start cups && sudo systemctl enable cups && sudo cupsctl --share-printers && sudo systemctl restart cups';
             break;
-        
         default:
             res.json({ success: false, message: `Unknown system task: ${task}` });
-            break;
+            return;
     }
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            res.json({ success: false, message: `${task} task failed: ${stderr}` });
+        } else {
+            res.json({ success: true, message: `${task} task completed successfully` });
+        }
+    });
 });
 
 app.listen(port, () => {
