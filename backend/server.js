@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 const auth = (req, res, next) => {
     const { username, password } = req.headers;
-    
+
     // This should use a more secure method of storing and comparing passwords
     if (username === 'admin' && password === 'password') {
         next();
@@ -27,14 +27,17 @@ app.post('/api/transfer', (req, res) => {
     let command;
 
     switch (direction) {
-        case 'windows-to-linux':
-            command = `smbclient '//${process.env.WINDOWS_SERVER_IP}/share' -c 'get "${sourceFile}" "${destFile}"'`;
+        case 'aws-to-windows':
+            command = `smbclient '//${process.env.WINDOWS_IP}/share' -U ${process.env.WINDOWS_USER}%${process.env.WINDOWS_PASS} -c 'put "${sourceFile}" "${destFile}"'`;
             break;
-        case 'linux-to-windows':
-            command = `smbclient '//${process.env.WINDOWS_SERVER_IP}/share' -c 'put "${sourceFile}" "${destFile}"'`;
+        case 'windows-to-aws':
+            command = `smbclient '//${process.env.WINDOWS_IP}/share' -U ${process.env.WINDOWS_USER}%${process.env.WINDOWS_PASS} -c 'get "${sourceFile}" "${destFile}"'`;
             break;
-        case 'linux-to-linux':
-            command = `scp ${sourceFile} ${process.env.LINUX_SERVER_USER}@${process.env.LINUX_SERVER_IP}:${destFile}`;
+        case 'aws-to-linux':
+            command = `scp "${sourceFile}" "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${destFile}"`;
+            break;
+        case 'linux-to-aws':
+            command = `scp "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${sourceFile}" "${destFile}"`;
             break;
         default:
             res.json({ success: false, message: 'Invalid transfer direction' });
