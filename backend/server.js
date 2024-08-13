@@ -13,13 +13,13 @@ app.post('/api/transfer', (req, res) => {
 
     switch (direction) {
         case 'windows-to-linux':
-            command = `smbclient '//WINDOWS_IP/share' -c 'get "${sourceFile}" "${destFile}"'`;
+            command = `smbclient '//${process.env.WINDOWS_SERVER_IP}/share' -c 'get "${sourceFile}" "${destFile}"'`;
             break;
         case 'linux-to-windows':
-            command = `smbclient '//WINDOWS_IP/share' -c 'put "${sourceFile}" "${destFile}"'`;
+            command = `smbclient '//${process.env.WINDOWS_SERVER_IP}/share' -c 'put "${sourceFile}" "${destFile}"'`;
             break;
         case 'linux-to-linux':
-            command = `scp ${sourceFile} user@SERVER_IP:${destFile}`;
+            command = `scp ${sourceFile} ${process.env.LINUX_SERVER_USER}@${process.env.LINUX_SERVER_IP}:${destFile}`;
             break;
         default:
             res.json({ success: false, message: 'Invalid transfer direction' });
