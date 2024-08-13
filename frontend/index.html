@@ -23,8 +23,39 @@
         <button onclick="transferFile()">Transfer</button>
     </div>
 
-    <!-- Rest of your HTML remains unchanged -->
+    <div class="section">
+        <h2>User Management</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="text" id="groupname" placeholder="Group Name">
+        <select id="userAction">
+            <option value="add">Add User</option>
+            <option value="remove">Remove User</option>
+            <option value="addToGroup">Add User to Group</option>
+            <option value="removeFromGroup">Remove User from Group</option>
+            <option value="createGroup">Create Group</option>
+            <option value="deleteGroup">Delete Group</option>
+        </select>
+        <button onclick="manageUser()">Execute</button>
+    </div>
 
+    <div class="section">
+        <h2>Access Control List (ACL) Management</h2>
+        <input type="text" id="aclPath" placeholder="File/Directory Path">
+        <input type="text" id="aclUser" placeholder="User">
+        <input type="text" id="aclPermissions" placeholder="Permissions (e.g., rwx)">
+        <select id="aclAction">
+            <option value="set">Set ACL</option>
+            <option value="get">Get ACL</option>
+        </select>
+        <button onclick="manageACL()">Execute</button>
+    </div>
+
+    <div class="section">
+        <h2>System Management</h2>
+        <button onclick="systemTask('backup')">Backup</button>
+        <button onclick="systemTask('dns')">Configure DNS</button>
+        <button onclick="systemTask('printer')">Setup Printer Sharing</button>
+    </div>
 </div>
 <script src="script.js"></script>
 </body>
