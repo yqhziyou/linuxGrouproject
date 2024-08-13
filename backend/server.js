@@ -1,10 +1,11 @@
 const express = require('express');
+const path = require('path');
 const { exec } = require('child_process');
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use(express.static('frontend'));
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 app.post('/api/transfer', (req, res) => {
     const { direction, sourceFile, destFile } = req.body;
