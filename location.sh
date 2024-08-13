@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Set environment variables
-export SSH_KEY_PATH="/path/to/your/private_key"
+export SSH_KEY_PATH="/home/ubuntu/KelvinsFirstKey"
 export WINDOWS_USER="your_windows_username"
 export WINDOWS_PASS="your_windows_password"
 export WINDOWS_IP="your_windows_ip"
-export LINUX_USER="your_linux_username"
-export LINUX_IP="your_linux_ip"
+export LINUX_USER="ubuntu"
+export LINUX_IP="3.144.143.231"
 
 # Add these variables to the /etc/environment file to persist after reboot
 echo "SSH_KEY_PATH=\"$SSH_KEY_PATH\"" | sudo tee -a /etc/environment
