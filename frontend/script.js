@@ -21,6 +21,7 @@ async function transferFile(direction) {
     }
 }
 
+
 async function manageUser(action) {
     const username = document.getElementById('username').value;
     try {

@@ -37,7 +37,47 @@ app.post('/api/user', (req, res) => {
 app.post('/api/system', (req, res) => {
     const { task } = req.body;
     // Implement system tasks here
-    res.json({ success: true, message: `System task ${task} initiated` });
+    switch (task) {
+        case 'backup':
+            exec('mkdir -p ~/backup && tar -czf ~/backup/data_backup.tar.gz ~/data && rsync -avz ~/backup/data_backup.tar.gz ~/backup_destination', (error, stdout, stderr) => {
+                if (error) {
+                    res.json({ success: false, message: `Backup failed: ${stderr}` });
+                } else {
+                    res.json({ success: true, message: 'Backup completed successfully' });
+                }
+            });
+            break;
+
+        case 'dns':
+            exec('sudo nano /etc/hosts && sudo systemctl restart systemd-resolved', (error, stdout, stderr) => {
+                if (error) {
+                    res.json({ success: false, message: `DNS configuration failed: ${stderr}` });
+                } else {
+                    res.json({ success: true, message: 'DNS configuration completed successfully' });
+                }
+            });
+            break;
+
+        case 'printer':
+            exec('sudo apt-get update && sudo apt-get install -y cups && sudo systemctl start cups && sudo systemctl enable cups', (error, stdout, stderr) => {
+                if (error) {
+                    res.json({ success: false, message: `Printer sharing setup failed: ${stderr}` });
+                } else {
+                    exec('sudo cupsctl --share-printers && sudo systemctl restart cups', (error, stdout, stderr) => {
+                        if (error) {
+                            res.json({ success: false, message: `Printer sharing configuration failed: ${stderr}` });
+                        } else {
+                            res.json({ success: true, message: 'Printer sharing setup completed successfully' });
+                        }
+                    });
+                }
+            });
+            break;
+        
+        default:
+            res.json({ success: false, message: `Unknown system task: ${task}` });
+            break;
+    }
 });
 
 app.listen(port, () => {
