@@ -34,10 +34,10 @@ app.post('/api/transfer', (req, res) => {
             command = `smbclient '//${process.env.WINDOWS_IP}/share' -U ${process.env.WINDOWS_USER}%${process.env.WINDOWS_PASS} -c 'get "${sourceFile}" "${destFile}"'`;
             break;
         case 'aws-to-linux':
-            command = `scp "${sourceFile}" "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${destFile}"`;
+            command = `scp -i ${process.env.SSH_KEY_PATH} "${sourceFile}" "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${destFile}"`;
             break;
         case 'linux-to-aws':
-            command = `scp "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${sourceFile}" "${destFile}"`;
+            command = `scp -i ${process.env.SSH_KEY_PATH} "${process.env.LINUX_USER}@${process.env.LINUX_IP}:${sourceFile}" "${destFile}"`;
             break;
         default:
             res.json({ success: false, message: 'Invalid transfer direction' });
